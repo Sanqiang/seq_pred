@@ -13,6 +13,8 @@ def get_args():
                         help='The Usage Model?')
     parser.add_argument('-ldir', '--logdir', default='../seq_pred_fd/log/',
                         help='Dir for log?')
+    parser.add_argument('-rdir', '--resultdir', default='../seq_pred_fd/result/',
+                        help='Dir for result?')
 
     # Graph
     parser.add_argument('-mlen', '--max_len', default=10, type=int,

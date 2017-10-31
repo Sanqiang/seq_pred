@@ -37,7 +37,8 @@ class Graph:
             self.inpt_events = [tf.zeros(args.batch_size, tf.int32, name='go')] + self.inputs_ph[:-1]
             self.inpt_events_emb = tf.stack(self.get_embedding(self.inpt_events), axis=1)
 
-            self.pred_events = self.inputs_ph
+            if not self.is_train:
+                self.pred_events = self.inputs_ph
 
             self_attention_bias = (
                 common_attention.attention_bias_lower_triangle(args.max_len))
@@ -69,6 +70,8 @@ class Graph:
                 clipped_grads, _ = tf.clip_by_global_norm(grads, 5.0)
                 self.train_op = opt.apply_gradients(
                     zip(clipped_grads, tf.trainable_variables()), global_step=self.global_step)
+            else:
+                self.last_event = tf.argmax(logits[:, -1, :], axis=-1)
 
             self.saver = tf.train.Saver(write_version=tf.train.SaverDef.V2)
         print('Graph Built.')

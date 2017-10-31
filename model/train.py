@@ -2,6 +2,7 @@ from model.arguments import get_args
 from data_generator.train_data import TrainData
 from util import constant
 from model.graph import Graph
+from model.test import test
 import tensorflow as tf
 import numpy as np
 from util.path import get_path
@@ -17,7 +18,7 @@ def get_data(inputs_ph):
     tmp_events = []
     for i in range(args.batch_size):
         events = data.get_data_sample()
-
+        events.insert(0, constant.START_ID)
         if len(events) < args.max_len:
             num_pad = args.max_len - len(events)
             events.extend(num_pad * [constant.PAD_ID])
@@ -52,6 +53,8 @@ def train():
         if step % 100 == 0:
             print('Loss\t%s.' % np.mean(losses))
             losses = []
+            test()
+
 
 if __name__ == '__main__':
     train()

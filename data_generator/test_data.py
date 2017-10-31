@@ -7,20 +7,24 @@ import random as rd
 args = get_args()
 
 
-class TrainData:
+class TestData:
     def __init__(self, mode='test'):
         self.pkl_data = pkl.load(
-            open(get_path(args.train_data_pkl), 'rb'),
+            open(get_path(args.test_data_pkl), 'rb'),
             encoding='latin1')
         self.data = self.pkl_data[mode]
         self.size = len(self.data)
         print('Load %s data!' % mode)
 
-    def get_data_sample(self):
-        i = rd.sample(range(self.size), 1)[0]
-        data_sample = self.data[i]
-        return [map['type_event'] for map in data_sample]
+    def get_data_iter(self):
+        i = 0
+        while True:
+            yield [map['type_event'] for map in self.data[i]]
+
+            i += 1
+            if i == self.size:
+                yield None
 
 
 if __name__ == '__main__':
-    TrainData().get_data_sample()
+    TestData().get_data_iter()
