@@ -4,6 +4,8 @@ from util import constant
 from model.graph import Graph
 import tensorflow as tf
 import numpy as np
+from util.path import get_path
+
 
 args = get_args()
 data = TrainData()
@@ -18,29 +20,28 @@ def get_data(inputs_ph):
 
         if len(events) < args.max_len:
             num_pad = args.max_len - len(events)
-            events.extend(num_pad * constant.PAD_ID)
+            events.extend(num_pad * [constant.PAD_ID])
         else:
             events = events[:args.max_len]
 
         tmp_events.append(events)
 
     for step in range(args.max_len):
-        input_feed[tmp_events[step].name] = [tmp_events[batch_idx][step]
+        input_feed[inputs_ph[step].name] = [tmp_events[batch_idx][step]
                                              for batch_idx in range(args.batch_size)]
 
     return input_feed
 
 
 def train():
-    graph = Graph()
+    graph = Graph(is_train=True)
     graph.create_model()
 
-
-    sv = tf.train.Supervisor(logdir=args.logdir,
+    sv = tf.train.Supervisor(logdir=get_path(args.logdir),
                              global_step=graph.global_step,
                              saver=graph.saver,
                              save_model_secs=600)
-    sess = sv.PrepareSession(config=tf.ConfigProto())
+    sess = sv.PrepareSession()
     losses = []
     while True:
         input_feed = get_data(graph.inputs_ph)
@@ -48,6 +49,9 @@ def train():
         _, loss, step = sess.run(fetches, input_feed)
         losses.append(loss)
 
-        if step % 1000 == 0:
+        if step % 100 == 0:
             print('Loss\t%s.' % np.mean(losses))
+            losses = []
 
+if __name__ == '__main__':
+    train()
