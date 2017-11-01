@@ -10,9 +10,8 @@ import os
 
 args = get_args()
 data = TestData()
-it = data.get_data_iter()
 
-def get_data(inputs_ph):
+def get_data(inputs_ph, it):
     input_feed = {}
 
     tmp_events = []
@@ -48,19 +47,19 @@ def get_data(inputs_ph):
 
 
 def test():
+    it = data.get_data_iter()
     graph = Graph(is_train=False)
+    tf.reset_default_graph()
     graph.create_model()
 
     sv = tf.train.Supervisor(logdir=get_path(args.logdir),
-                             global_step=graph.global_step,
-                             saver=graph.saver,
-                             save_model_secs=600)
+                             global_step=graph.global_step)
     sess = sv.PrepareSession()
     losses = []
     scores = 0
     total = 0
     while True:
-        input_feed, gt_last_events, effective_batch_size, is_end = get_data(graph.inputs_ph)
+        input_feed, gt_last_events, effective_batch_size, is_end = get_data(graph.inputs_ph, it)
         fetches = [graph.last_event, graph.loss, graph.global_step]
         last_events, loss, step = sess.run(fetches, input_feed)
 

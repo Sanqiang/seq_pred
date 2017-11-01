@@ -2,7 +2,6 @@ from model.arguments import get_args
 from data_generator.train_data import TrainData
 from util import constant
 from model.graph import Graph
-from model.test import test
 import tensorflow as tf
 import numpy as np
 from util.path import get_path
@@ -53,6 +52,8 @@ def train():
         if step % 100 == 0:
             print('Loss\t%s.' % np.mean(losses))
             losses = []
+
+            from model.test import test
             test()
 
 

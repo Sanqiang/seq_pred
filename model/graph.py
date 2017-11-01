@@ -37,8 +37,7 @@ class Graph:
             self.inpt_events = [tf.zeros(args.batch_size, tf.int32, name='go')] + self.inputs_ph[:-1]
             self.inpt_events_emb = tf.stack(self.get_embedding(self.inpt_events), axis=1)
 
-            if not self.is_train:
-                self.pred_events = self.inputs_ph
+            self.pred_events = self.inputs_ph
 
             self_attention_bias = (
                 common_attention.attention_bias_lower_triangle(args.max_len))
@@ -115,7 +114,3 @@ class Graph:
                             dropout=hparams.relu_dropout)
                         x = common_layers.layer_postprocess(x, y, hparams)
             return common_layers.layer_preprocess(x, hparams)
-
-
-
-
